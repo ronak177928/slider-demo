@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Loop Stacked Slider</title>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f3f0e8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #2c2c2c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Outer Wrapper */
+    .carousel-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      padding: 40px 15px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Container for Slides */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      /* Dynamic height scaling with viewport */
+      height: clamp(480px, 65vh, 560px);
+      touch-action: pan-y; /* Smooth mobile swipe */
+    }
+
+    /* Individual Slide */
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: clamp(240px, 75vw, 300px);
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                  opacity 0.5s ease, 
+                  visibility 0.5s ease;
+      cursor: pointer;
+      user-select: none;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Card Image Wrapper */
+    .slide-img {
+      width: 100%;
+      height: clamp(280px, 42vh, 340px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+      background-color: #e0e0e0;
+    }
+
+    .slide-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Slide Content (Text below card) */
+    .slide-content {
+      margin-top: 20px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s;
+      text-align: left;
+    }
+
+    .slide-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #2c2c2c;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .slide-tag span {
+      color: #9d9688;
+      font-weight: 400;
+    }
+
+    .slide-content p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #4a4a4a;
+    }
+
+    /* ---------------------------------- */
+    /* Dynamic Slide Positions (3D Effect) */
+    /* ---------------------------------- */
+
+    /* Active (Center) Slide */
+    .slide.active {
+      z-index: 10;
+      transform: translateX(-50%) scale(1.05);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .slide.active .slide-content {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Previous Slide (Left) */
+    .slide.prev {
+      z-index: 5;
+      transform: translateX(-125%) scale(0.88);
+      opacity: 0.85;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* Next Slide (Right) */
+    .slide.next {
+      z-index: 5;
+      transform: translateX(25%) scale(0.88);
+      opacity: 0.85;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* Far Left Hidden Slide (for smooth loop transitions) */
+    .slide.far-prev {
+      z-index: 1;
+      transform: translateX(-180%) scale(0.7);
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Far Right Hidden Slide */
+    .slide.far-next {
+      z-index: 1;
+      transform: translateX(80%) scale(0.7);
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Pagination Dots */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      z-index: 20;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1.5px solid #1e293b;
+      background-color: transparent;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .dot.active {
+      background-color: #1e293b;
+    }
+
+    .dot:hover {
+      transform: scale(1.25);
+    }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 600px) {
+      .slide.prev {
+        transform: translateX(-110%) scale(0.85);
+      }
+      .slide.next {
+        transform: translateX(10%) scale(0.85);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="carousel-wrapper">
+    <div class="carousel-container" id="carouselContainer">
+      
+      <!-- Slide 1 -->
+      <div class="slide">
+        <div class="slide-img">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop" alt="Slide 1">
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag">H&M <span>CASE STUDY</span></span>
+          <p>As brands grow, responsibility becomes fragmented across internal teams and channel agencies, each optimising in isolation with no single commercial owner accountable for the whole.</p>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="slide">
+        <div class="slide-img">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop" alt="Slide 2">
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag">HEUR <span>CASE STUDY</span></span>
+          <p>Heur is an e-commerce growth consultancy offering senior brand leadership across luxury, fashion, and lifestyle businesses to drive scalable commercial success.</p>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="slide">
+        <div class="slide-img">
+          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop" alt="Slide 3">
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag">UNION <span>CASE STUDY</span></span>
+          <p>Creating consistent brand experiences across retail and digital touchpoints to elevate customer retention and build lasting commercial momentum.</p>
+        </div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div class="slide">
+        <div class="slide-img">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop" alt="Slide 4">
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag">ZARA <span>CASE STUDY</span></span>
+          <p>Optimizing end-to-end supply chain visibility and digital storefront performance to reduce friction across global markets.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Dots Container -->
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+
+  <!-- jQuery CDN -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      const $slides = $('.slide');
+      const totalSlides = $slides.length;
+      let currentIndex = 0;
+
+      // 1. Dynamically Generate Dots based on total slides
+      const $dotsContainer = $('#carouselDots');
+      for (let i = 0; i < totalSlides; i++) {
+        $dotsContainer.append('<span class="dot"></span>');
+      }
+      const $dots = $('.dot');
+
+      // 2. Core Render Function (Infinite Loop logic)
+      function renderSlider(index) {
+        // Ensure index wraps around infinitely using modulo operator
+        currentIndex = (index + totalSlides) % totalSlides;
+
+        // Calculate cyclic positions relative to current active index
+        const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        const nextIndex = (currentIndex + 1) % totalSlides;
+
+        $slides.each(function (i) {
+          const $slide = $(this);
+          $slide.removeClass('active prev next far-prev far-next');
+
+          if (i === currentIndex) {
+            $slide.addClass('active');
+          } else if (i === prevIndex) {
+            $slide.addClass('prev');
+          } else if (i === nextIndex) {
+            $slide.addClass('next');
+          } else {
+            // Determine side for hidden slides to transition smoothly
+            if ((i < currentIndex && !(currentIndex === totalSlides - 1 && i === 0)) || 
+                (currentIndex === 0 && i === totalSlides - 1)) {
+              $slide.addClass('far-prev');
+            } else {
+              $slide.addClass('far-next');
+            }
+          }
+        });
+
+        // Sync Active Dot
+        $dots.removeClass('active').eq(currentIndex).addClass('active');
+      }
+
+      // 3. Event Listeners
+      
+      // Click on any slide to activate/navigate
+      $slides.on('click', function () {
+        const slideIndex = $(this).index();
+        renderSlider(slideIndex);
+      });
+
+      // Click on pagination dots
+      $dots.on('click', function () {
+        const dotIndex = $(this).index();
+        renderSlider(dotIndex);
+      });
+
+      // Keyboard navigation (Left / Right Arrow Keys)
+      $(document).on('keydown', function (e) {
+        if (e.key === 'ArrowRight') {
+          renderSlider(currentIndex + 1);
+        } else if (e.key === 'ArrowLeft') {
+          renderSlider(currentIndex - 1);
+        }
+      });
+
+      // 4. Touch & Swipe Logic for Mobile Devices
+      let touchStartX = 0;
+      let touchEndX = 0;
+      const $container = $('#carouselContainer');
+
+      $container.on('touchstart', function (e) {
+        touchStartX = e.originalEvent.touches[0].clientX;
+      });
+
+      $container.on('touchend', function (e) {
+        touchEndX = e.originalEvent.changedTouches[0].clientX;
+        handleSwipe();
+      });
+
+      function handleSwipe() {
+        const swipeDistance = touchEndX - touchStartX;
+        const minSwipeThreshold = 40; // minimum pixels to count as swipe
+
+        if (swipeDistance < -minSwipeThreshold) {
+          // Swiped Left -> Next
+          renderSlider(currentIndex + 1);
+        } else if (swipeDistance > minSwipeThreshold) {
+          // Swiped Right -> Prev
+          renderSlider(currentIndex - 1);
+        }
+      }
+
+      // Initial Render
+      renderSlider(0);
+    });
+  </script>
+
+</body>
+</html>
