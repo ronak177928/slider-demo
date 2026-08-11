@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Stacked Slider with Dynamic Height</title>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f3f0e8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #2c2c2c;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .carousel-wrapper {
+      width: 100%;
+      max-width: 402px; 
+      padding: 0px 12px; 
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      touch-action: pan-y;
+      overflow: hidden;
+      cursor: grab;
+      display: flex;
+      justify-content: center;
+      transition: height 0.3s ease;
+    }
+
+    .carousel-container:active {cursor: grabbing;}
+
+    .agencies-slide {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      max-width: 254px;
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, visibility 0.5s ease;
+      user-select: none;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .slide-img {
+      width: 100%;
+      height: 277px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      background-color: #e0e0e0;
+    }
+
+    .slide-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    .slide-content {
+      width: 100%;
+      margin-top: 20px;
+      text-align: left;
+      padding: 0 4px;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.1s;
+    }
+
+    .slide-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #2c2c2c;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .slide-tag span {
+      color: #9d9688;
+      font-weight: 400;
+    }
+
+    .slide-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #4a4a4a;
+    }
+
+    .agencies-slide.active {
+      left: 50%;
+      z-index: 10;
+      transform: translate3d(-50%, 15px, 0) scale(1);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .agencies-slide.active .slide-content {
+      opacity: 1;
+    }
+
+    .agencies-slide {
+      z-index: 5;
+      transform: translate3d(0, 45px, 0) scale(0.8);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .agencies-slide.prev {
+      left: 0;
+      transform-origin: left top;
+    }
+
+    .agencies-slide.next {
+      right: 0;
+      transform-origin: right top;
+    }
+
+    .agencies-slide.far-prev {
+      left: 0;
+      z-index: 1;
+      transform: translate3d(-100%, 0, 0) scale(0.8);
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .agencies-slide.far-next {
+      right: 0;
+      z-index: 1;
+      transform: translate3d(100%, 0, 0) scale(0.8);
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid #1e293b;
+      background-color: transparent;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .carousel-dot.active {
+      background-color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="carousel-wrapper">
+    <div class="carousel-container" id="AgenciesCarousel">
+      <div class="agencies-slide">
+        <div class="agencies-slide-img">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop" alt="Slide 1">
+        </div>
+        <div class="agencies-slide-content">
+          <span class="agencies-slide-tag">H&M <span>CASE STUDY</span></span>
+          <p class="agencies-slide-text">As brands grow, responsibility becomes fragmented across internal teams and channel agencies, each optimising in isolation with no single commercial owner accountable for the whole.</p>
+        </div>
+      </div>
+      <div class="slide">
+        <div class="slide-img">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop" alt="Slide 2">
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag">HEUR <span>CASE STUDY</span></span>
+          <p class="slide-text">Heur is an e-commerce growth consultancy offering senior brand leadership across luxury, fashion, and lifestyle businesses to drive scalable commercial success.</p>
+        </div>
+      </div>
+      <div class="slide">
+        <div class="slide-img">
+          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop" alt="Slide 3">
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag">UNION <span>CASE STUDY</span></span>
+          <p class="slide-text">Creating consistent brand experiences across retail and digital touchpoints to elevate customer retention and build lasting commercial momentum. Flexible strategies tailored to brand equity.</p>
+        </div>
+      </div>
+      <div class="slide">
+        <div class="slide-img">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop" alt="Slide 4">
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag">ZARA <span>CASE STUDY</span></span>
+          <p class="slide-text">Optimizing end-to-end supply chain visibility and digital storefront performance to reduce friction across global markets.</p>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-dots" id="AgenciesCarouselDots"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      const $container = $('#AgenciesCarousel');
+      const $slides = $('.agencies-slide');
+      const totalSlides = $slides.length;
+      let currentIndex = 0;
+
+      function syncContainerHeight() {
+        let maxHeight = 0;
+
+        $slides.each(function () {
+          const $slide = $(this);
+          const slideHeight = $slide.outerHeight(true);
+          if (slideHeight > maxHeight) {
+            maxHeight = slideHeight;
+          }
+        });
+
+        const scaledMaxHeight = Math.ceil(maxHeight * 1.05);
+        $container.css('height', scaledMaxHeight + 'px');
+      }
+
+      const $dotsContainer = $('#AgenciesCarouselDots');
+      for (let i = 0; i < totalSlides; i++) {
+        $dotsContainer.append('<span class="carousel-dot"></span>');
+      }
+      const $dots = $('.carousel-dot');
+
+      function renderSlider(index) {
+        currentIndex = (index + totalSlides) % totalSlides;
+
+        const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        const nextIndex = (currentIndex + 1) % totalSlides;
+
+        $slides.each(function (i) {
+          const $slide = $(this);
+          $slide.removeClass('active prev next far-prev far-next');
+
+          if (i === currentIndex) {
+            $slide.addClass('active');
+          } else if (i === prevIndex) {
+            $slide.addClass('prev');
+          } else if (i === nextIndex) {
+            $slide.addClass('next');
+          } else {
+            if ((i < currentIndex && !(currentIndex === totalSlides - 1 && i === 0)) || 
+                (currentIndex === 0 && i === totalSlides - 1)) {
+              $slide.addClass('far-prev');
+            } else {
+              $slide.addClass('far-next');
+            }
+          }
+        });
+
+        $dots.removeClass('active').eq(currentIndex).addClass('active');
+      }
+
+      $slides.on('click', function () {
+        if (!isDragging) {
+          renderSlider($(this).index());
+        }
+      });
+
+      $dots.on('click', function () {
+        renderSlider($(this).index());
+      });
+
+      let isDragging = false;
+      let startX = 0;
+      let currentX = 0;
+      const dragThreshold = 30;
+
+      function handleStart(e) {
+        isDragging = true;
+        startX = e.type.includes('touch') ? e.originalEvent.touches[0].clientX : e.clientX;
+        currentX = startX;
+      }
+
+      function handleMove(e) {
+        if (!isDragging) return;
+        currentX = e.type.includes('touch') ? e.originalEvent.touches[0].clientX : e.clientX;
+      }
+
+      function handleEnd() {
+        if (!isDragging) return;
+        const diffX = currentX - startX;
+
+        if (Math.abs(diffX) > dragThreshold) {
+          if (diffX < 0) {
+            renderSlider(currentIndex + 1);
+          } else {
+            renderSlider(currentIndex - 1);
+          }
+        }
+
+        isDragging = false;
+        startX = 0;
+        currentX = 0;
+      }
+
+      $container.on('mousedown touchstart', handleStart);
+      $(window).on('mousemove touchmove', handleMove);
+      $(window).on('mouseup touchend', handleEnd);
+
+      renderSlider(0);
+
+      syncContainerHeight();
+      $(window).on('resize load', syncContainerHeight);
+    });
+  </script>
+
+</body>
+</html>
